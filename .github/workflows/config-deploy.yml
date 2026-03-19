@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Config-Server/**'
+      - 'Config-Server/**'   # ← already correct
 
 jobs:
   build-and-deploy:

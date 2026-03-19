@@ -17,98 +17,67 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // handles @Valid validation errors
-    // e.g. blank email, invalid email format
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(
-            MethodArgumentNotValidException ex,
-            WebRequest request) {
+            MethodArgumentNotValidException ex, WebRequest request) {
 
         Map<String, String> fieldErrors = new HashMap<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             fieldErrors.put(error.getField(), error.getDefaultMessage());
         }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now().toString());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Validation Failed");
-        response.put("fields", fieldErrors);
-        response.put("path", request.getDescription(false));
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation Failed", request, fieldErrors);
     }
 
-    // handles business logic errors
-    // e.g. user not found, email already registered, invalid password
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(
-            RuntimeException ex,
-            WebRequest request) {
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now().toString());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", ex.getMessage());
-        response.put("path", request.getDescription(false));
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(
+            UserNotFoundException ex, WebRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
     }
 
-    // handles JWT token missing or invalid
-    // e.g. accessing protected endpoint without token
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailExists(
+            EmailAlreadyExistsException ex, WebRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(
+            InvalidCredentialsException ex, WebRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuthenticationException(
-            AuthenticationException ex,
-            WebRequest request) {
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now().toString());
-        response.put("status", HttpStatus.UNAUTHORIZED.value());
-        response.put("error", "Unauthorized — invalid or missing token");
-        response.put("path", request.getDescription(false));
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
+            AuthenticationException ex, WebRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Unauthorized — invalid or missing token", request, null);
     }
 
-    // handles role based access errors
-    // e.g. JOB_SEEKER trying to access ADMIN endpoint
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
-            AccessDeniedException ex,
-            WebRequest request) {
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now().toString());
-        response.put("status", HttpStatus.FORBIDDEN.value());
-        response.put("error", "Access denied — you don't have permission");
-        response.put("path", request.getDescription(false));
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(response);
+            AccessDeniedException ex, WebRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, "Access denied — you don't have permission", request, null);
     }
 
-    // handles any other unexpected errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(
-            Exception ex,
-            WebRequest request) {
+            Exception ex, WebRequest request) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", request, null);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildResponse(
+            HttpStatus status, String message, WebRequest request, Map<String, String> fieldErrors) {
 
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now().toString());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Something went wrong: " + ex.getMessage());
+        response.put("status", status.value());
+        response.put("error", message);
         response.put("path", request.getDescription(false));
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(response);
+        if (fieldErrors != null && !fieldErrors.isEmpty()) {
+            response.put("fields", fieldErrors);
+        }
+
+        return ResponseEntity.status(status).body(response);
     }
 }

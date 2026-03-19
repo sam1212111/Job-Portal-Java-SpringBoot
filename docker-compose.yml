@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    build: ../eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+
+  config-server:
+    build: ../config-server
+    container_name: config-server
+    ports:
+      - "7777:7777"
+    depends_on:
+      - eureka-server
+    env_file:
+      - .env                  
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge

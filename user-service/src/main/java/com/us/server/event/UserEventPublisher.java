@@ -1,6 +1,7 @@
 package com.us.server.event;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import com.us.server.dto.UserEventDto;
 @Service
 public class UserEventPublisher {
 
+    private static final Logger log = LoggerFactory.getLogger(UserEventPublisher.class);
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -20,7 +23,6 @@ public class UserEventPublisher {
                 RabbitMqConfig.USER_REGISTERED_KEY,
                 event
         );
-        System.out.println("User registered event published: "
-            + event.getEmail());
+        log.info("User registered event published for {}", event.getEmail());
     }
 }

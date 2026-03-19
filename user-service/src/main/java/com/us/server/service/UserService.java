@@ -4,11 +4,13 @@ import com.us.server.dto.*;
 
 public interface UserService {
 
-    UserDto register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
 
     LoginResponse login(LoginRequest request);
 
-    UserDto getUserById(Long id);
+    UserDto getUserById(String externalUserId);
 
-    UserDto updateUser(Long id, UserDto dto);
+    UserDto updateUser(String externalUserId, UpdateUserRequest request);
+
+    Long parseExternalUserId(String externalUserId);
 }

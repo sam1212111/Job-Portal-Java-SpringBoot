@@ -1,6 +1,70 @@
+# ===========================
+# Secrets - Never upload these
+# ===========================
+.env
+**/.env
+**/k8s/secret.yml
+
+# ===========================
+# Eclipse IDE Files
+# ===========================
 .metadata/
-**/target/
-**/.settings/
-**/.project
 **/.classpath
+**/.project
+**/.settings/
+**/bin/
+*.launch
+*.pydevproject
+.recommenders/
+.factorypath
+RemoteSystemsTempFiles/
+
+# ===========================
+# Maven Build Files
+# ===========================
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+
+# ===========================
+# Spring Boot
+# ===========================
+**/application-local.yml
+**/application-prod.yml
+
+# ===========================
+# Docker
+# ===========================
+docker-compose.override.yml
+
+# ===========================
+# OS Files (Windows)
+# ===========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===========================
+# Logs
+# ===========================
 *.log
+**/logs/
+
+# ===========================
+# Java
+# ===========================
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# ===========================
+# Test Coverage
+# ===========================
+**/test-output/

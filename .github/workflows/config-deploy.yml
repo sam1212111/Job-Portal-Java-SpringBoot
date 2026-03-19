@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Config-Server/**'   # ← already correct
+      - 'Config-Server/**'
 
 jobs:
   build-and-deploy:
@@ -21,9 +21,18 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Build jar
         run: |
           cd Config-Server
+          chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: Login to Docker Hub

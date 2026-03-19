@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'EurekaServer/**'    # ← changed to match actual folder name
+      - 'EurekaServer/**'
 
 jobs:
   build-and-deploy:
@@ -23,7 +23,8 @@ jobs:
 
       - name: Build jar
         run: |
-          cd EurekaServer             
+          cd EurekaServer
+          chmod +x mvnw        
           ./mvnw clean package -DskipTests
 
       - name: Login to Docker Hub
@@ -35,6 +36,6 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v4
         with:
-          context: ./EurekaServer      
+          context: ./EurekaServer
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/eureka-server:latest

@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: config-server
-          image: config-server:latest
-          imagePullPolicy: Never
+          image: sam3232333/config-server:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 7777
           envFrom:
@@ -24,5 +24,3 @@ spec:
           env:
             - name: EUREKA_URL
               value: http://eureka-server:8761/eureka/
-
-
